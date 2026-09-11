@@ -1,0 +1,56 @@
+# .NET build and publish output
+[Bb]in/
+[Oo]bj/
+[Aa]rtifacts/
+[Pp]ublish/
+
+# Visual Studio and Rider local state
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.sln.iml
+
+# Keep shared VS Code settings; ignore local history
+.vscode/.history/
+.history/
+
+# Test results and coverage
+[Tt]est[Rr]esults/
+coverage/
+coverage.xml
+coverage.json
+*.coverage
+*.coveragexml
+
+# NuGet packages (restored automatically)
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+# Local logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Local secrets and deployment credentials
+.env
+.env.*
+!.env.example
+!.env.sample
+appsettings.Local.json
+appsettings.*.Local.json
+*.pubxml
+*.publishsettings
+*.pfx
+*.p12
+
+# Operating system files
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
