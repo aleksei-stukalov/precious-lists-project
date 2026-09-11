@@ -51,6 +51,7 @@ appsettings.*.Local.json
 
 # Operating system files
 .DS_Store
+**/.DS_Store
 ._*
 Thumbs.db
 Desktop.ini
