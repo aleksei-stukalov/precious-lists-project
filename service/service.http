@@ -1,0 +1,6 @@
+@service_HostAddress = https://localhost:7183
+
+GET {{service_HostAddress}}/
+Accept: application/json
+
+###

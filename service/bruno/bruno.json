@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "precious-lists",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
