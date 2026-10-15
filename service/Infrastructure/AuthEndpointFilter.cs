@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
+using PreciousLists.Controllers;
+using PreciousLists.Models;
+using PreciousLists.Services;
 
-namespace PreciousLists.Features.Auth;
+namespace PreciousLists.Infrastructure;
 
 // Adds project-specific safeguards around the framework's Identity endpoints.
 public sealed class AuthEndpointFilter(

@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
+using PreciousLists.Controllers;
 using PreciousLists.Infrastructure.Persistence;
+using PreciousLists.Models;
+using PreciousLists.Services;
 
-namespace PreciousLists.Features.Auth;
+namespace PreciousLists.Infrastructure;
 
 public static class AuthenticationSetup
 {

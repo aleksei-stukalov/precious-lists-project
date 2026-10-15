@@ -2,8 +2,9 @@ using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using PreciousLists.Models;
 
-namespace PreciousLists.Features.Auth;
+namespace PreciousLists.Infrastructure;
 
 // Development-only delivery. No messages leave the machine and tokens are never logged.
 public sealed class DevelopmentEmailSender(

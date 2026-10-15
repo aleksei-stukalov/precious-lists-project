@@ -6,8 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using PreciousLists.Infrastructure.Persistence;
+using PreciousLists.Models;
 
-namespace PreciousLists.Features.Auth;
+namespace PreciousLists.Services;
 
 // Identity issues tokens; this service adds single-use refresh and replay detection.
 public sealed class RefreshTokenService(

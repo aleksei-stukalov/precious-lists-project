@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
+using PreciousLists.Models;
 
-namespace PreciousLists.Features.Auth;
+namespace PreciousLists.Infrastructure;
 
 // Built-in access tokens normally stay valid until expiry. Validate the stamp on
 // every authenticated request to make password resets and logout immediate.

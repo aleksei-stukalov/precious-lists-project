@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace PreciousLists.Features.Auth;
+namespace PreciousLists.Models;
 
 public class ApplicationUser : IdentityUser
 {
