@@ -5,6 +5,8 @@
 
 # dotenv files
 .env
+.local-mail/
+.keys/
 
 # User-specific files
 *.rsuser

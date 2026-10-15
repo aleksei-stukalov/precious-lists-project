@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Nested tests and local API-client files do not belong in the service build/publish. -->
+    <Compile Remove="tests/**/*.cs" />
+    <Content Remove="tests/**;bruno/**" />
+    <None Remove="tests/**;bruno/**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.*" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.*">
