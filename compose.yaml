@@ -6,6 +6,8 @@ services:
       - "8443:8443"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      Authentication__PublicBaseUrl: https://localhost:8443
+      Authentication__DataProtectionKeysPath: /app/.keys
       ASPNETCORE_HTTP_PORTS: "8080"
       ASPNETCORE_HTTPS_PORTS: "8443"
       ASPNETCORE_HTTPS_PORT: "8443"
@@ -14,6 +16,8 @@ services:
       ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=preciouslists;Username=preciouslists;Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
     volumes:
       - ./.certs:/https:ro
+      - auth_keys:/app/.keys
+      - auth_mail:/app/.local-mail
     depends_on:
       db:
         condition: service_healthy
@@ -36,3 +40,5 @@ services:
 
 volumes:
   postgres_data:
+  auth_keys:
+  auth_mail:
