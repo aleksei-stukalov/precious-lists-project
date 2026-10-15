@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PreciousLists.Infrastructure.Persistence;
-using PreciousLists.Features.Auth;
+using PreciousLists.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -2,8 +2,9 @@ using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
+using PreciousLists.Models;
 
-namespace PreciousLists.Features.Auth;
+namespace PreciousLists.Controllers;
 
 public sealed record ReauthenticationRequest(string Password, string? TwoFactorCode = null,
     string? TwoFactorRecoveryCode = null);

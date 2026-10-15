@@ -1,14 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PreciousLists.Infrastructure.Persistence;
 
-namespace PreciousLists.Features.Auth;
-
-public sealed class UsedRefreshToken
-{
-    // SHA-256 fingerprint of a consumed token, never the reusable credential itself.
-    public string Hash { get; set; } = "";
-    public DateTimeOffset ExpiresAt { get; set; }
-}
+namespace PreciousLists.Services;
 
 public sealed class RefreshTokenCleanup(IServiceScopeFactory scopes, ILogger<RefreshTokenCleanup> logger)
     : BackgroundService

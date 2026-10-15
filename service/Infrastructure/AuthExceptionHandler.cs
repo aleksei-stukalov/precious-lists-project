@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 
-namespace PreciousLists.Features.Auth;
+namespace PreciousLists.Infrastructure;
 
 public sealed class AuthExceptionHandler : IExceptionHandler
 {
