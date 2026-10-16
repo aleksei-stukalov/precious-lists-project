@@ -21,31 +21,33 @@ public sealed class RefreshTokenService(
     {
         var settings = options.Get(IdentityConstants.BearerScheme);
         var ticket = settings.RefreshTokenProtector.Unprotect(token);
-        if (ticket?.Properties.ExpiresUtc is not { } expires || expires <= clock.GetUtcNow()
+        if (ticket?.Properties.ExpiresUtc is not { } expires
+            || expires <= clock.GetUtcNow()
             || await signIn.ValidateSecurityStampAsync(ticket.Principal) is not { } user
-            || !user.EmailConfirmed || await signIn.UserManager.IsLockedOutAsync(user))
+            || !user.EmailConfirmed
+            || await signIn.UserManager.IsLockedOutAsync(user))
             return false;
 
         // Store only a fingerprint. The primary key lets just one concurrent request win.
-        var used = new UsedRefreshToken
-        {
+        var used = new UsedRefreshToken {
             Hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token))),
             ExpiresAt = expires
         };
         database.UsedRefreshTokens.Add(used);
-        try
-        {
+        try {
             await database.SaveChangesAsync(cancellation);
             return true;
         }
-        catch (DbUpdateException exception) when (exception.InnerException is PostgresException
-            { SqlState: PostgresErrorCodes.UniqueViolation })
-        {
+        catch (DbUpdateException exception)
+            when (exception.InnerException is PostgresException {
+                      SqlState: PostgresErrorCodes.UniqueViolation
+                  }) {
             // Detach the failed insert before Identity saves the security stamp.
             database.Entry(used).State = EntityState.Detached;
             var revoked = await signIn.UserManager.UpdateSecurityStampAsync(user);
             if (!revoked.Succeeded)
-                throw new InvalidOperationException("Could not revoke sessions after refresh-token replay.");
+                throw new InvalidOperationException(
+                    "Could not revoke sessions after refresh-token replay.");
             return false;
         }
     }
