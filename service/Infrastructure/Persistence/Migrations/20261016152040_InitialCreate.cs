@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace service.Infrastructure.Persistence.Migrations
+namespace PreciousLists.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -49,20 +49,6 @@ namespace service.Infrastructure.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Collections",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    ThumbnailUrl = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Collections", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -184,44 +170,58 @@ namespace service.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Collections",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Collections", x => x.Id);
+                    table.UniqueConstraint("AK_Collections_Id_UserId", x => new { x.Id, x.UserId });
+                    table.CheckConstraint("CK_Collections_Name_NotBlank", "btrim(\"Name\") <> ''");
+                    table.ForeignKey(
+                        name: "FK_Collections_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Items",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     CollectionId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UserId = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    ThumbnailIndex = table.Column<short>(type: "smallint", nullable: true)
+                    Description = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Items", x => x.Id);
-                    table.CheckConstraint("CK_Items_ThumbnailIndex_NonNegative", "\"ThumbnailIndex\" IS NULL OR \"ThumbnailIndex\" >= 0");
+                    table.CheckConstraint("CK_Items_Name_NotBlank", "btrim(\"Name\") <> ''");
+                    table.ForeignKey(
+                        name: "FK_Items_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Items_Collections_CollectionId",
                         column: x => x.CollectionId,
                         principalTable: "Collections",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ItemImages",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ItemId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Url = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ItemImages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ItemImages_Items_ItemId",
-                        column: x => x.ItemId,
-                        principalTable: "Items",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Items_Collections_CollectionId_UserId",
+                        columns: x => new { x.CollectionId, x.UserId },
+                        principalTable: "Collections",
+                        principalColumns: new[] { "Id", "UserId" });
                 });
 
             migrationBuilder.CreateIndex(
@@ -262,14 +262,19 @@ namespace service.Infrastructure.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ItemImages_ItemId",
-                table: "ItemImages",
-                column: "ItemId");
+                name: "IX_Collections_UserId",
+                table: "Collections",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Items_CollectionId",
+                name: "IX_Items_CollectionId_UserId",
                 table: "Items",
-                column: "CollectionId");
+                columns: new[] { "CollectionId", "UserId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Items_UserId",
+                table: "Items",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsedRefreshTokens_ExpiresAt",
@@ -296,7 +301,7 @@ namespace service.Infrastructure.Persistence.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "ItemImages");
+                name: "Items");
 
             migrationBuilder.DropTable(
                 name: "UsedRefreshTokens");
@@ -305,13 +310,10 @@ namespace service.Infrastructure.Persistence.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "Items");
-
-            migrationBuilder.DropTable(
                 name: "Collections");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

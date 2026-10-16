@@ -9,10 +9,10 @@ using PreciousLists.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace service.Infrastructure.Persistence.Migrations
+namespace PreciousLists.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261015135318_InitialCreate")]
+    [Migration("20261016152040_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -234,12 +234,18 @@ namespace service.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ThumbnailUrl")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Collections");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Collections", t =>
+                        {
+                            t.HasCheckConstraint("CK_Collections_Name_NotBlank", "btrim(\"Name\") <> ''");
+                        });
                 });
 
             modelBuilder.Entity("PreciousLists.Models.Item", b =>
@@ -258,37 +264,20 @@ namespace service.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<short?>("ThumbnailIndex")
-                        .HasColumnType("smallint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CollectionId");
-
-                    b.ToTable("Items", t =>
-                        {
-                            t.HasCheckConstraint("CK_Items_ThumbnailIndex_NonNegative", "\"ThumbnailIndex\" IS NULL OR \"ThumbnailIndex\" >= 0");
-                        });
-                });
-
-            modelBuilder.Entity("PreciousLists.Models.ItemImage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ItemId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Url")
+                    b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("ItemImages");
+                    b.HasIndex("CollectionId", "UserId");
+
+                    b.ToTable("Items", t =>
+                        {
+                            t.HasCheckConstraint("CK_Items_Name_NotBlank", "btrim(\"Name\") <> ''");
+                        });
                 });
 
             modelBuilder.Entity("PreciousLists.Models.UsedRefreshToken", b =>
@@ -358,21 +347,33 @@ namespace service.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PreciousLists.Models.Collection", b =>
+                {
+                    b.HasOne("PreciousLists.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("PreciousLists.Models.Item", b =>
                 {
                     b.HasOne("PreciousLists.Models.Collection", null)
                         .WithMany()
                         .HasForeignKey("CollectionId")
                         .OnDelete(DeleteBehavior.SetNull);
-                });
 
-            modelBuilder.Entity("PreciousLists.Models.ItemImage", b =>
-                {
-                    b.HasOne("PreciousLists.Models.Item", null)
+                    b.HasOne("PreciousLists.Models.ApplicationUser", null)
                         .WithMany()
-                        .HasForeignKey("ItemId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("PreciousLists.Models.Collection", null)
+                        .WithMany()
+                        .HasForeignKey("CollectionId", "UserId")
+                        .HasPrincipalKey("Id", "UserId")
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 #pragma warning restore 612, 618
         }
