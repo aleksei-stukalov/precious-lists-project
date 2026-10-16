@@ -9,7 +9,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<UsedRefreshToken> UsedRefreshTokens => Set<UsedRefreshToken>();
     public DbSet<Item> Items => Set<Item>();
-    public DbSet<ItemImage> ItemImages => Set<ItemImage>();
     public DbSet<Collection> Collections => Set<Collection>();
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -23,25 +22,47 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.HasIndex(token => token.ExpiresAt);
         });
 
-        // Configure foreign keys without requiring EF navigation properties in the models.
+        builder.Entity<Collection>(entity =>
+        {
+            entity
+                .HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(collection => collection.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasAlternateKey(collection => new { collection.Id, collection.UserId });
+            entity.ToTable(table =>
+                table.HasCheckConstraint("CK_Collections_Name_NotBlank", "btrim(\"Name\") <> ''")
+            );
+        });
+
+        // Models use explicit foreign keys without navigation properties.
         builder.Entity<Item>(entity =>
         {
-            entity.HasOne<Collection>()
+            entity
+                .HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(item => item.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity
+                .HasOne<Collection>()
                 .WithMany()
                 .HasForeignKey(item => item.CollectionId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            entity.ToTable(table => table.HasCheckConstraint(
-                "CK_Items_ThumbnailIndex_NonNegative",
-                "\"ThumbnailIndex\" IS NULL OR \"ThumbnailIndex\" >= 0"));
+            // Prevent assigning an item to another user's collection. The simple FK
+            // above clears CollectionId on deletion; UserId must remain unchanged.
+            entity
+                .HasOne<Collection>()
+                .WithMany()
+                .HasForeignKey(item => new { item.CollectionId, item.UserId })
+                .HasPrincipalKey(collection => new { collection.Id, collection.UserId })
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.ToTable(table =>
+                table.HasCheckConstraint("CK_Items_Name_NotBlank", "btrim(\"Name\") <> ''")
+            );
         });
 
-        builder.Entity<ItemImage>(entity =>
-        {
-            entity.HasOne<Item>()
-                .WithMany()
-                .HasForeignKey(image => image.ItemId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
     }
 }

@@ -1,16 +1,20 @@
 using Microsoft.EntityFrameworkCore;
-using PreciousLists.Infrastructure.Persistence;
 using PreciousLists.Infrastructure;
+using PreciousLists.Controllers;
+using PreciousLists.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Resolve configuration when the context is created so integration tests can
 // replace the connection string before any database access happens.
 builder.Services.AddDbContext<ApplicationDbContext>((services, options) =>
-    options.UseNpgsql(services.GetRequiredService<IConfiguration>()
-        .GetConnectionString("DefaultConnection")
+    options.UseNpgsql(
+        services.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection")
         ?? throw new InvalidOperationException(
-            "Connection string 'DefaultConnection' is missing.")));
+            "Connection string 'DefaultConnection' is missing."
+        )
+    )
+);
 
 builder.Services.AddOpenApi();
 builder.AddAccountAuthentication();
@@ -27,8 +31,10 @@ app.UseRateLimiter(); // Apply rate limiting to all requests.
 app.UseMiddleware<SecurityStampMiddleware>(); // Reject requests with a stale security stamp
 app.UseAuthorization(); // Reject requests that fail the authorization policy.
 
-// Map the endpoints for account authentication (login, refresh, logout, etc.)
-app.MapAccountAuthentication();
+// Map the endpoints.
+app.MapAccountAuthenticationEndpoints();
+app.MapCollectionEndpoints();
+app.MapItemEndpoints();
 
 // Liveness only: this does not check PostgreSQL or other dependencies.
 app.MapGet("/", () => Results.Ok(new { status = "ok" }));
