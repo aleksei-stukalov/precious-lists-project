@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
+/* Brand tokens from precious-lists-nextjs/tailwind.config.js. */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
-
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+  --font-sans: "Kumbh Sans", system-ui, sans-serif;
+  --color-magpie: #1e1e1e;
+  --color-paper: #f7f7f4;
+  --color-papercut: #f8f8f6;
+  --color-gold: #c6b391;
+  --color-golden: #f7f7f4;
+  --color-ivy: #51675f;
+  --breakpoint-laptop: 60rem;
+  --breakpoint-desktop: 85rem;
+  --breakpoint-widescreen: 110rem;
 }
